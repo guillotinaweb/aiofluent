@@ -5,6 +5,7 @@ import socket
 import threading
 import time
 import traceback
+import asyncio
 
 import msgpack
 
@@ -52,6 +53,7 @@ class FluentSender(object):
         self.socket = None
         self.pendings = None
         self.lock = threading.Lock()
+        self.alock = asyncio.Lock()
         self._last_error_threadlocal = threading.local()
 
         try:
@@ -74,6 +76,17 @@ class FluentSender(object):
                                         "message": "Can't output to log",
                                         "traceback": traceback.format_exc()})
         return self._send(bytes_)
+
+    async def async_emit_with_time(self, label, timestamp, data):
+        try:
+            bytes_ = self._make_packet(label, timestamp, data)
+        except Exception as e:
+            self.last_error = e
+            bytes_ = self._make_packet(label, timestamp,
+                                       {"level": "CRITICAL",
+                                        "message": "Can't output to log",
+                                        "traceback": traceback.format_exc()})
+        return await self._async_send(bytes_)
 
     def close(self):
         self.lock.acquire()
@@ -107,6 +120,14 @@ class FluentSender(object):
         finally:
             self.lock.release()
 
+    async def _async_send(self, bytes_):
+        self.alock.acquire()
+        try:
+            return await self._async_send_internal(bytes_)
+        finally:
+            self.alock.release()
+
+
     def _send_internal(self, bytes_):
         # buffering
         if self.pendings:
@@ -136,11 +157,47 @@ class FluentSender(object):
 
             return False
 
+    async def _async_send_internal(self, bytes_):
+        # buffering
+        if self.pendings:
+            self.pendings += bytes_
+            bytes_ = self.pendings
+
+        try:
+            await self._async_send_data(bytes_)
+
+            # send finished
+            self.pendings = None
+
+            return True
+        except socket.error as e:
+        #except Exception as e:
+            self.last_error = e
+
+            # close socket
+            self._close()
+
+            # clear buffer if it exceeds max bufer size
+            if self.pendings and (len(self.pendings) > self.bufmax):
+                self._call_buffer_overflow_handler(self.pendings)
+                self.pendings = None
+            else:
+                self.pendings = bytes_
+
+            return False
+
     def _send_data(self, bytes_):
         # reconnect if possible
         self._reconnect()
         # send message
         self.socket.sendall(bytes_)
+
+    async def _async_send_data(self, bytes_):
+        # reconnect if possible
+        await self._async_reconnect()
+        # send message
+        loop = asyncio.get_event_loop()
+        await loop.sock_sendall(self.socket, bytes_)
 
     def _reconnect(self):
         if not self.socket:
@@ -152,6 +209,19 @@ class FluentSender(object):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.settimeout(self.timeout)
                 sock.connect((self.host, self.port))
+            self.socket = sock
+
+    async def _async_reconnect(self):
+        loop = asyncio.get_event_loop()
+        if not self.socket:
+            if self.host.startswith('unix://'):
+                sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                sock.settimeout(self.timeout)
+                await loop.sock_connect(sock, (self.host[len('unix://'):]))
+            else:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(self.timeout)
+                await loop.sock_connect(sock, ((self.host, self.port)))
             self.socket = sock
 
     def _call_buffer_overflow_handler(self, pending_events):

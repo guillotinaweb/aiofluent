@@ -108,6 +108,10 @@ class FluentHandler(logging.Handler):
         data = self.format(record)
         return self.sender.emit(None, data)
 
+    async def async_emit(self, record):
+        data = self.format(record)
+        return await self.sender.async_emit(None, data)
+
     def close(self):
         self.acquire()
         try:
