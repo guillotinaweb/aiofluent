@@ -125,7 +125,7 @@ class FluentSender(object):
         try:
             result = await self._async_send_internal(bytes_)
         finally:
-            await self.alock.release()
+            self.alock.release()
         return result
 
     def _send_internal(self, bytes_):
