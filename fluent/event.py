@@ -14,8 +14,13 @@ class Event(object):
 
 
 class AsyncEvent(object):
-    async def __init__(self, label, data, **kwargs):
+    def __init__(self, label, data, **kwargs):
         assert isinstance(data, dict), 'data must be a dict'
-        sender_ = kwargs.get('sender', sender.get_global_sender())
-        timestamp = kwargs.get('time', int(time.time()))
-        await sender_.async_emit_with_time(label, timestamp, data)
+        self.label = label
+        self.data = data
+        self.sender_ = kwargs.get('sender', sender.get_global_sender())
+        self.timestamp = kwargs.get('time', int(time.time()))
+
+    async def __call__(self):
+        await self.sender_.async_emit_with_time(
+            self.label, self.timestamp, self.data)
