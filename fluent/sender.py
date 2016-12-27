@@ -121,12 +121,12 @@ class FluentSender(object):
             self.lock.release()
 
     async def _async_send(self, bytes_):
-        self.alock.acquire()
+        await self.alock.acquire()
         try:
-            return await self._async_send_internal(bytes_)
+            result = await self._async_send_internal(bytes_)
         finally:
-            self.alock.release()
-
+            await self.alock.release()
+        return result
 
     def _send_internal(self, bytes_):
         # buffering
