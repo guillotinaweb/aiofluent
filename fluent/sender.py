@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
 import socket
 import threading
 import time
@@ -31,8 +29,10 @@ def setup(tag, **kwargs):
 def get_global_sender():
     return _global_sender
 
+
 def close():
     get_global_sender().close()
+
 
 class FluentSender(object):
     def __init__(self,
@@ -105,7 +105,6 @@ class FluentSender(object):
         finally:
             self.lock.release()
 
-
     def _make_packet(self, label, timestamp, data):
         if label:
             tag = '.'.join((self.tag, label))
@@ -145,7 +144,6 @@ class FluentSender(object):
 
             return True
         except socket.error as e:
-        #except Exception as e:
             self.last_error = e
 
             # close socket
@@ -174,7 +172,6 @@ class FluentSender(object):
 
             return True
         except socket.error as e:
-        #except Exception as e:
             self.last_error = e
 
             # close socket
@@ -251,9 +248,9 @@ class FluentSender(object):
 
     @last_error.setter
     def last_error(self, err):
-        self._last_error_threadlocal.exception  =  err
+        self._last_error_threadlocal.exception = err
 
-    def clear_last_error(self, _thread_id = None):
+    def clear_last_error(self, _thread_id=None):
         if hasattr(self._last_error_threadlocal, 'exception'):
             delattr(self._last_error_threadlocal, 'exception')
 

@@ -3,8 +3,7 @@
 import logging
 import unittest
 
-import fluent.handler
-
+import aiofluent.handler
 from tests import mockserver
 
 

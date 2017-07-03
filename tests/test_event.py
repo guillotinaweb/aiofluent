@@ -2,10 +2,13 @@
 
 import unittest
 
-from fluent import event, sender
+from aiofluent import event, sender
 from tests import mockserver
 
-class TestException(BaseException): pass
+
+class TestException(BaseException):
+    pass
+
 
 class TestEvent(unittest.TestCase):
     def setUp(self):
@@ -44,8 +47,9 @@ class TestEvent(unittest.TestCase):
         self.assertEqual(global_sender.last_error, None)
         sender.close()
 
-    @unittest.skip("This test failed with 'TypeError: catching classes that do not inherit from BaseException is not allowed' so skipped")
-    #@patch('fluent.sender.socket')
+    @unittest.skip("This test failed with 'TypeError: catching classes that do not "
+                   "inherit from BaseException is not allowed' so skipped")
+    # @patch('fluent.sender.socket')
     def test_connect_exception_during_event_send(self, mock_socket):
         # Make the socket.socket().connect() call raise a custom exception
         mock_connect = mock_socket.socket.return_value.connect

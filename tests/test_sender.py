@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-import unittest
 import socket
+import unittest
 
-import fluent.sender
+import aiofluent.sender
 from tests import mockserver
 
 
@@ -14,24 +13,24 @@ class TestSetup(unittest.TestCase):
         _set_global_sender(None)
 
     def test_no_kwargs(self):
-        fluent.sender.setup("tag")
-        actual = fluent.sender.get_global_sender()
+        aiofluent.sender.setup("tag")
+        actual = aiofluent.sender.get_global_sender()
         self.assertEqual(actual.tag, "tag")
         self.assertEqual(actual.host, "localhost")
         self.assertEqual(actual.port, 24224)
         self.assertEqual(actual.timeout, 3.0)
 
     def test_host_and_port(self):
-        fluent.sender.setup("tag", host="myhost", port=24225)
-        actual = fluent.sender.get_global_sender()
+        aiofluent.sender.setup("tag", host="myhost", port=24225)
+        actual = aiofluent.sender.get_global_sender()
         self.assertEqual(actual.tag, "tag")
         self.assertEqual(actual.host, "myhost")
         self.assertEqual(actual.port, 24225)
         self.assertEqual(actual.timeout, 3.0)
 
     def test_tolerant(self):
-        fluent.sender.setup("tag", host="myhost", port=24225, timeout=1.0)
-        actual = fluent.sender.get_global_sender()
+        aiofluent.sender.setup("tag", host="myhost", port=24225, timeout=1.0)
+        actual = aiofluent.sender.get_global_sender()
         self.assertEqual(actual.tag, "tag")
         self.assertEqual(actual.host, "myhost")
         self.assertEqual(actual.port, 24225)
@@ -42,8 +41,8 @@ class TestSender(unittest.TestCase):
     def setUp(self):
         super(TestSender, self).setUp()
         self._server = mockserver.MockRecvServer('localhost')
-        self._sender = fluent.sender.FluentSender(tag='test',
-                                                  port=self._server.port)
+        self._sender = aiofluent.sender.FluentSender(tag='test',
+                                                     port=self._server.port)
 
     def tearDown(self):
         self._sender.close()
@@ -84,8 +83,9 @@ class TestSender(unittest.TestCase):
 
         self.assertEqual(self._sender.last_error, None)
 
-    @unittest.skip("This test failed with 'TypeError: catching classes that do not inherit from BaseException is not allowed' so skipped")
-    #@patch('fluent.sender.socket')
+    @unittest.skip("This test failed with 'TypeError: catching classes that do not "
+                   "inherit from BaseException is not allowed' so skipped")
+    # @patch('fluent.sender.socket')
     def test_connect_exception_during_sender_init(self, mock_socket):
         # Make the socket.socket().connect() call raise a custom exception
         mock_connect = mock_socket.socket.return_value.connect

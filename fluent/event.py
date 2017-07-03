@@ -2,7 +2,7 @@
 
 import time
 
-from fluent import sender
+from aiofluent import sender
 
 
 class Event(object):

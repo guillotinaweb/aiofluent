@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-
-try:
-    from cStringIO import StringIO as BytesIO
-except ImportError:
-    from io import BytesIO
-
 import socket
 import threading
 import time
+from io import BytesIO
 
 from msgpack import Unpacker
 

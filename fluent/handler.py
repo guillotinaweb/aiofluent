@@ -1,20 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from aiofluent import sender
+
+import json
 import logging
 import socket
-import sys
-
-try:
-    import simplejson as json
-except ImportError:  # pragma: no cover
-    import json
-
-try:
-    basestring
-except NameError:  # pragma: no cover
-    basestring = (str, bytes)
-
-from fluent import sender
 
 
 class FluentRecordFormatter(logging.Formatter, object):
@@ -39,17 +29,18 @@ class FluentRecordFormatter(logging.Formatter, object):
         self.hostname = socket.gethostname()
 
     def format(self, record):
-        # Only needed for python2.6
-        if sys.version_info[0:2] <= (2, 6) and self.usesTime():
-            record.asctime = self.formatTime(record, self.datefmt)
-
         # Compute attributes handled by parent class.
         super(FluentRecordFormatter, self).format(record)
         # Add ours
         record.hostname = self.hostname
         # Apply format
-        data = dict([(key, value % record.__dict__)
-                     for key, value in self._fmt_dict.items()])
+        data = {}
+        for key, value in self._fmt_dict.items():
+            try:
+                data[key] = value % record.__dict__
+            except KeyError:
+                # we are okay with missing values here...
+                pass
 
         self._structuring(data, record)
         return data
@@ -71,7 +62,7 @@ class FluentRecordFormatter(logging.Formatter, object):
 
         if isinstance(msg, dict):
             self._add_dic(data, msg)
-        elif isinstance(msg, basestring):
+        elif isinstance(msg, str):
             try:
                 self._add_dic(data, json.loads(str(msg)))
             except ValueError:
@@ -83,7 +74,7 @@ class FluentRecordFormatter(logging.Formatter, object):
     @staticmethod
     def _add_dic(data, dic):
         for key, value in dic.items():
-            if isinstance(key, basestring):
+            if isinstance(key, str):
                 data[str(key)] = value
 
 

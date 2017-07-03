@@ -1,13 +1,9 @@
 A Python structured logger for Fluentd
 ======================================
 
-.. image:: https://travis-ci.org/fluent/fluent-logger-python.svg?branch=master
-   :target: https://travis-ci.org/fluent/fluent-logger-python
-   :alt: Build Status
+WARNING: This is a fork of the https://github.com/fluent/fluent-logger-python
+project to work with asyncio.
 
-.. image:: https://coveralls.io/repos/fluent/fluent-logger-python/badge.svg
-   :target: https://coveralls.io/r/fluent/fluent-logger-python
-   :alt: Coverage Status
 
 Many web/mobile applications generate huge amount of event logs (c,f.
 login, logout, purchase, follow, etc). To analyze these event logs could
@@ -24,7 +20,7 @@ Python application.
 Requirements
 ------------
 
--  Python 2.6 or greater including 3.x
+-  Python 3.5 or greater
 - ``msgpack-python``
 
 Installation
@@ -70,7 +66,7 @@ can also specify remote logger by passing the options.
 
 .. code:: python
 
-    from fluent import sender
+    from aiofluent import sender
 
     # for local fluent
     logger = sender.FluentSender('app')
