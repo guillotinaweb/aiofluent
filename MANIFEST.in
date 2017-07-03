@@ -1,3 +1,5 @@
 include README.rst
 include setup.py
 include COPYING
+include .coveragerc
+recursive-include tests *.py
