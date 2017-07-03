@@ -12,7 +12,7 @@ desc = 'A Python logging handler for Fluentd event collector'
 
 setup(
   name='aiofluent',
-  version='1.0.0',
+  version='1.0.1.dev0',
   description=desc,
   long_description=open(README).read(),
   package_dir={'fluent': 'fluent'},
@@ -24,7 +24,6 @@ setup(
   download_url='http://pypi.python.org/pypi/aiofluent/',
   license='Apache License, Version 2.0',
   classifiers=[
-    'Programming Language :: Python :: 2',
     'Programming Language :: Python :: 3',
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
