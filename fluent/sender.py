@@ -10,6 +10,8 @@ import asyncio
 import msgpack
 
 
+IS_IPV6 = True if 'IPV6' in os.environ else False
+
 _global_sender = None
 
 
@@ -206,9 +208,14 @@ class FluentSender(object):
                 sock.settimeout(self.timeout)
                 sock.connect(self.host[len('unix://'):])
             else:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(self.timeout)
-                sock.connect((self.host, self.port))
+                if IS_IPV6 is False:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(self.timeout)
+                    sock.connect((self.host, self.port))
+                else:
+                    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                    sock.settimeout(self.timeout)
+                    sock.connect((self.host, self.port, 0, 0))
             self.socket = sock
 
     async def _async_reconnect(self):
@@ -219,9 +226,14 @@ class FluentSender(object):
                 sock.settimeout(self.timeout)
                 await loop.sock_connect(sock, (self.host[len('unix://'):]))
             else:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(self.timeout)
-                await loop.sock_connect(sock, ((self.host, self.port)))
+                if IS_IPV6 is False:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(self.timeout)
+                    await loop.sock_connect(sock, ((self.host, self.port)))
+                else:
+                    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                    sock.settimeout(self.timeout)
+                    await loop.sock_connect(sock, ((self.host, self.port, 0, 0)))
             self.socket = sock
 
     def _call_buffer_overflow_handler(self, pending_events):
