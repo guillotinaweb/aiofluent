@@ -8,6 +8,7 @@ import traceback
 import asyncio
 
 import msgpack
+import os
 
 
 IS_IPV6 = True if 'IPV6' in os.environ else False
