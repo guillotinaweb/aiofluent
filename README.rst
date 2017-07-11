@@ -113,7 +113,7 @@ Initialization code of Event-Based API is below:
 
 .. code:: python
 
-    from fluent import sender
+    from aiofluent import sender
 
     # for local fluent
     sender.setup('app')
@@ -126,7 +126,7 @@ fluentd, with tag 'app.follow' and the attributes 'from' and 'to'.
 
 .. code:: python
 
-    from fluent import event
+    from aiofluent import event
 
     # send event to fluentd, with 'app.follow' tag
     event.Event('follow', {
@@ -173,7 +173,7 @@ module.
 .. code:: python
 
     import logging
-    from fluent import handler
+    from aiofluent import handler
 
     custom_format = {
       'host': '%(hostname)s',

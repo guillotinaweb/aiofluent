@@ -9,7 +9,7 @@ from tests import mockserver
 
 class TestSetup(unittest.TestCase):
     def tearDown(self):
-        from fluent.sender import _set_global_sender
+        from aiofluent.sender import _set_global_sender
         _set_global_sender(None)
 
     def test_no_kwargs(self):

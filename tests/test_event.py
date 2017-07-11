@@ -16,7 +16,7 @@ class TestEvent(unittest.TestCase):
         sender.setup('app', port=self._server.port)
 
     def tearDown(self):
-        from fluent.sender import _set_global_sender
+        from aiofluent.sender import _set_global_sender
         sender.close()
         _set_global_sender(None)
 
