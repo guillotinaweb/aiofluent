@@ -14,7 +14,7 @@ collecting these logs easily and reliably.
 having: easy installation, small footprint, plugins, reliable buffering,
 log forwarding, etc.
 
-**fluent-logger-python** is a Python library, to record the events from
+**aiofluent** is a Python library, to record the events from
 Python application.
 
 Requirements
@@ -26,12 +26,12 @@ Requirements
 Installation
 ------------
 
-This library is distributed as 'fluent-logger' python package. Please
+This library is distributed as 'aiofluent' python package. Please
 execute the following command to install it.
 
 .. code:: sh
 
-    $ pip install fluent-logger
+    $ pip install aiofluent
 
 Configuration
 -------------
@@ -160,7 +160,7 @@ You can inject your own custom proc to handle buffer overflow in the event of co
 
     logger = sender.FluentSender('app', host='host', port=24224, buffer_overflow_handler=handler)
 
-You should handle any exception in handler. fluent-logger ignores exceptions from ``buffer_overflow_handler``.
+You should handle any exception in handler. aiofluent ignores exceptions from ``buffer_overflow_handler``.
 
 This handler is also called when pending events exist during `close()`.
 
@@ -254,18 +254,6 @@ A sample configuration ``logging.yaml`` would be:
                 handlers: [console, fluent]
                 level: DEBUG
                 propagate: False
-
-Testing
--------
-
-Testing can be done using
-`nose <https://nose.readthedocs.org/en/latest/>`__.
-
-Contributors
-------------
-
-Patches contributed by `those
-people <https://github.com/fluent/fluent-logger-python/contributors>`__.
 
 License
 -------
