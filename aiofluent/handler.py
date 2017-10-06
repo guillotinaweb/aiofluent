@@ -131,5 +131,7 @@ class FluentHandler(logging.Handler):
         try:
             self.sender._close()
             logging.Handler.close(self)
+            if self._queue_task is not None and not self._queue_task.done():
+                self._queue_task.cancel()
         finally:
             self.release()
