@@ -2,6 +2,7 @@
 
 from aiofluent import sender
 
+import asyncio
 import json
 import logging
 import socket
@@ -82,6 +83,10 @@ class FluentHandler(logging.Handler):
     '''
     Logging Handler for fluent.
     '''
+
+    _queue = None
+    _queue_task = None
+
     def __init__(self,
                  tag,
                  host='localhost',
@@ -95,7 +100,25 @@ class FluentHandler(logging.Handler):
                                           timeout=timeout, verbose=verbose)
         logging.Handler.__init__(self)
 
+    async def consume_queue(self, initial_record):
+        self._queue = asyncio.Queue()
+        self._queue.put_nowait(initial_record)
+        while True:
+            record = await self._queue.get()
+            await self.async_emit(record)
+            self._queue.task_done()
+
     def emit(self, record):
+        if self._queue_task is None or self._queue_task.done():
+            self._queue_task = asyncio.ensure_future(self.consume_queue(record))
+        else:
+            try:
+                self._queue.put_nowait(record)
+            except AttributeError:
+                # just log with sync now...
+                self.sync_emit(record)
+
+    def sync_emit(self, record):
         data = self.format(record)
         return self.sender.emit(None, data)
 
