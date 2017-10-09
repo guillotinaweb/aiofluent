@@ -78,9 +78,10 @@ class FluentSender(object):
                                         "traceback": traceback.format_exc()})
         return self._send(bytes_)
 
-    async def async_emit(self, label, data):
-        cur_time = int(time.time())
-        return await self.async_emit_with_time(label, cur_time, data)
+    async def async_emit(self, label, data, timestamp=None):
+        if timestamp is None:
+            timestamp = int(time.time())
+        return await self.async_emit_with_time(label, timestamp, data)
 
     async def async_emit_with_time(self, label, timestamp, data):
         try:
@@ -128,6 +129,8 @@ class FluentSender(object):
         await self.alock.acquire()
         try:
             result = await self._async_send_internal(bytes_)
+        except Exception:
+            result = None
         finally:
             self.alock.release()
         return result

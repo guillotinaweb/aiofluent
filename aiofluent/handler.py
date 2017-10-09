@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import socket
+import time
 
 
 class FluentRecordFormatter(logging.Formatter, object):
@@ -104,8 +105,8 @@ class FluentHandler(logging.Handler):
         self._queue = asyncio.Queue()
         self._queue.put_nowait(initial_record)
         while True:
-            record = await self._queue.get()
-            await self.async_emit(record)
+            record, timestamp = await self._queue.get()
+            await self.async_emit(record, timestamp)
             self._queue.task_done()
 
     def emit(self, record):
@@ -113,7 +114,7 @@ class FluentHandler(logging.Handler):
             self._queue_task = asyncio.ensure_future(self.consume_queue(record))
         else:
             try:
-                self._queue.put_nowait(record)
+                self._queue.put_nowait((record, int(time.time())))
             except AttributeError:
                 # just log with sync now...
                 self.sync_emit(record)
@@ -122,9 +123,9 @@ class FluentHandler(logging.Handler):
         data = self.format(record)
         return self.sender.emit(None, data)
 
-    async def async_emit(self, record):
+    async def async_emit(self, record, timestamp=None):
         data = self.format(record)
-        return await self.sender.async_emit(None, data)
+        return await self.sender.async_emit(None, data, timestamp)
 
     def close(self):
         self.acquire()
