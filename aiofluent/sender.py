@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
+import asyncio
+import msgpack
+import os
 import socket
 import threading
 import time
 import traceback
-import asyncio
-
-import msgpack
-import os
-
 
 IS_IPV6 = True if 'IPV6' in os.environ else False
 
@@ -80,6 +78,11 @@ class FluentSender(object):
                                         "traceback": traceback.format_exc()})
         return self._send(bytes_)
 
+    async def async_emit(self, label, data, timestamp=None):
+        if timestamp is None:
+            timestamp = int(time.time())
+        return await self.async_emit_with_time(label, timestamp, data)
+
     async def async_emit_with_time(self, label, timestamp, data):
         try:
             bytes_ = self._make_packet(label, timestamp, data)
@@ -126,6 +129,8 @@ class FluentSender(object):
         await self.alock.acquire()
         try:
             result = await self._async_send_internal(bytes_)
+        except Exception:
+            result = None
         finally:
             self.alock.release()
         return result
