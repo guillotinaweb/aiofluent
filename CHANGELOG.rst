@@ -1,4 +1,4 @@
-1.0.2 (unreleased)
+1.0.2 (2017-10-09)
 ------------------
 
 - Fix to make normal logging call async
