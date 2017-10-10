@@ -103,7 +103,7 @@ class FluentHandler(logging.Handler):
 
     async def consume_queue(self, initial_record):
         self._queue = asyncio.Queue()
-        self._queue.put_nowait(initial_record)
+        self._queue.put_nowait((initial_record, int(time.time())))
         while True:
             record, timestamp = await self._queue.get()
             await self.async_emit(record, timestamp)

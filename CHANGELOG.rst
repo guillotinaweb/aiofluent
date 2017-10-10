@@ -1,7 +1,7 @@
 1.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix pushing initial record
 
 
 1.0.3 (2017-10-10)
