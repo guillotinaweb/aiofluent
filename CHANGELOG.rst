@@ -1,7 +1,8 @@
 1.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle Runtime error when logging done before event loop started
+  [vangheem]
 
 
 1.0.2 (2017-10-09)
