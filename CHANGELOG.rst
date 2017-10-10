@@ -1,4 +1,4 @@
-1.0.3 (unreleased)
+1.0.3 (2017-10-10)
 ------------------
 
 - Handle Runtime error when logging done before event loop started
