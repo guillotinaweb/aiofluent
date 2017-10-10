@@ -111,7 +111,11 @@ class FluentHandler(logging.Handler):
 
     def emit(self, record):
         if self._queue_task is None or self._queue_task.done():
-            self._queue_task = asyncio.ensure_future(self.consume_queue(record))
+            try:
+                self._queue_task = asyncio.ensure_future(self.consume_queue(record))
+            except RuntimeError:
+                # no event loop running, log synchronous
+                self.sync_emit(record)
         else:
             try:
                 self._queue.put_nowait((record, int(time.time())))
