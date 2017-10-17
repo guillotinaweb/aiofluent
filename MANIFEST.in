@@ -3,3 +3,4 @@ include setup.py
 include COPYING
 include .coveragerc
 recursive-include tests *.py
+include *.rst
