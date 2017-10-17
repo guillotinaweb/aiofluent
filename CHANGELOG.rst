@@ -1,4 +1,4 @@
-1.0.5 (unreleased)
+1.0.5 (2017-10-17)
 ------------------
 
 - Fix release to include CHANGELOG.rst file
