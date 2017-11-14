@@ -1,7 +1,8 @@
 1.0.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Prevent log queue from getting too large
+  [vangheem]
 
 
 1.0.5 (2017-10-17)

@@ -1,95 +1,68 @@
 # -*- coding: utf-8 -*-
-
-import socket
-import unittest
-
 import aiofluent.sender
-from tests import mockserver
+import socket
 
 
-class TestSetup(unittest.TestCase):
-    def tearDown(self):
-        from aiofluent.sender import _set_global_sender
-        _set_global_sender(None)
+def test_no_kwargs():
+    aiofluent.sender.setup("tag")
+    actual = aiofluent.sender.get_global_sender()
+    assert actual.tag == "tag"
+    assert actual.host == "localhost"
+    assert actual.port == 24224
+    assert actual.timeout == 3.0
 
-    def test_no_kwargs(self):
-        aiofluent.sender.setup("tag")
-        actual = aiofluent.sender.get_global_sender()
-        self.assertEqual(actual.tag, "tag")
-        self.assertEqual(actual.host, "localhost")
-        self.assertEqual(actual.port, 24224)
-        self.assertEqual(actual.timeout, 3.0)
+    from aiofluent.sender import _set_global_sender
+    _set_global_sender(None)
 
-    def test_host_and_port(self):
-        aiofluent.sender.setup("tag", host="myhost", port=24225)
-        actual = aiofluent.sender.get_global_sender()
-        self.assertEqual(actual.tag, "tag")
-        self.assertEqual(actual.host, "myhost")
-        self.assertEqual(actual.port, 24225)
-        self.assertEqual(actual.timeout, 3.0)
+def test_host_and_port():
+    aiofluent.sender.setup("tag", host="myhost", port=24225)
+    actual = aiofluent.sender.get_global_sender()
+    assert actual.tag == "tag"
+    assert actual.host == "myhost"
+    assert actual.port == 24225
+    assert actual.timeout == 3.0
 
-    def test_tolerant(self):
-        aiofluent.sender.setup("tag", host="myhost", port=24225, timeout=1.0)
-        actual = aiofluent.sender.get_global_sender()
-        self.assertEqual(actual.tag, "tag")
-        self.assertEqual(actual.host, "myhost")
-        self.assertEqual(actual.port, 24225)
-        self.assertEqual(actual.timeout, 1.0)
+    from aiofluent.sender import _set_global_sender
+    _set_global_sender(None)
+
+def test_tolerant():
+    aiofluent.sender.setup("tag", host="myhost", port=24225, timeout=1.0)
+    actual = aiofluent.sender.get_global_sender()
+    assert actual.tag == "tag"
+    assert actual.host == "myhost"
+    assert actual.port == 24225
+    assert actual.timeout == 1.0
+
+    from aiofluent.sender import _set_global_sender
+    _set_global_sender(None)
 
 
-class TestSender(unittest.TestCase):
-    def setUp(self):
-        super(TestSender, self).setUp()
-        self._server = mockserver.MockRecvServer('localhost')
-        self._sender = aiofluent.sender.FluentSender(tag='test',
-                                                     port=self._server.port)
+def test_simple(mock_sender, mock_server):
+    mock_sender.emit('foo', {'bar': 'baz'})
+    mock_sender._close()
+    data = mock_server.get_recieved()
+    assert 1 == len(data)
+    assert 3 == len(data[0])
+    assert 'test.foo' == data[0][0]
+    assert {'bar': 'baz'} == data[0][2]
+    assert data[0][1]
+    assert isinstance(data[0][1], int)
 
-    def tearDown(self):
-        self._sender.close()
+def test_no_last_error_on_successful_emit(mock_sender, mock_server):
+    mock_sender.emit('foo', {'bar': 'baz'})
+    mock_sender._close()
 
-    def get_data(self):
-        return self._server.get_recieved()
+    assert mock_sender.last_error is None
 
-    def test_simple(self):
-        sender = self._sender
-        sender.emit('foo', {'bar': 'baz'})
-        sender._close()
-        data = self.get_data()
-        eq = self.assertEqual
-        eq(1, len(data))
-        eq(3, len(data[0]))
-        eq('test.foo', data[0][0])
-        eq({'bar': 'baz'}, data[0][2])
-        self.assertTrue(data[0][1])
-        self.assertTrue(isinstance(data[0][1], int))
+def test_last_error_property(mock_sender, mock_server):
+    EXCEPTION_MSG = "custom exception for testing last_error property"
+    mock_sender.last_error = socket.error(EXCEPTION_MSG)
 
-    def test_no_last_error_on_successful_emit(self):
-        sender = self._sender
-        sender.emit('foo', {'bar': 'baz'})
-        sender._close()
+    assert mock_sender.last_error.args[0] == EXCEPTION_MSG
 
-        self.assertEqual(sender.last_error, None)
+def test_clear_last_error(mock_sender, mock_server):
+    EXCEPTION_MSG = "custom exception for testing clear_last_error"
+    mock_sender.last_error = socket.error(EXCEPTION_MSG)
+    mock_sender.clear_last_error()
 
-    def test_last_error_property(self):
-        EXCEPTION_MSG = "custom exception for testing last_error property"
-        self._sender.last_error = socket.error(EXCEPTION_MSG)
-
-        self.assertEqual(self._sender.last_error.args[0], EXCEPTION_MSG)
-
-    def test_clear_last_error(self):
-        EXCEPTION_MSG = "custom exception for testing clear_last_error"
-        self._sender.last_error = socket.error(EXCEPTION_MSG)
-        self._sender.clear_last_error()
-
-        self.assertEqual(self._sender.last_error, None)
-
-    @unittest.skip("This test failed with 'TypeError: catching classes that do not "
-                   "inherit from BaseException is not allowed' so skipped")
-    # @patch('fluent.sender.socket')
-    def test_connect_exception_during_sender_init(self, mock_socket):
-        # Make the socket.socket().connect() call raise a custom exception
-        mock_connect = mock_socket.socket.return_value.connect
-        EXCEPTION_MSG = "a sender init socket connect() exception"
-        mock_connect.side_effect = socket.error(EXCEPTION_MSG)
-
-        self.assertEqual(self._sender.last_error.args[0], EXCEPTION_MSG)
+    assert mock_sender.last_error is None

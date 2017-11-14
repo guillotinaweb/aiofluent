@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
+from msgpack import Unpacker
+
 import socket
 import threading
 import time
-from io import BytesIO
-
-from msgpack import Unpacker
 
 
 class MockRecvServer(threading.Thread):
