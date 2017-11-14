@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import time
-
 from aiofluent import sender
+
+import time
 
 
 class Event(object):

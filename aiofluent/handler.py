@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import socket
+import sys
 import time
 
 
@@ -80,6 +81,11 @@ class FluentRecordFormatter(logging.Formatter, object):
                 data[str(key)] = value
 
 
+# we do *not* use maxsize setting on queue because the python implementation
+# of maxsize will block when we hit the max size--which we do not want to do
+MAX_QUEUE_SIZE = 1000
+
+
 class FluentHandler(logging.Handler):
     '''
     Logging Handler for fluent.
@@ -93,8 +99,9 @@ class FluentHandler(logging.Handler):
                  host='localhost',
                  port=24224,
                  timeout=3.0,
-                 verbose=False):
-
+                 verbose=False,
+                 loop=None):
+        self.loop = loop
         self.tag = tag
         self.sender = sender.FluentSender(tag,
                                           host=host, port=port,
@@ -112,13 +119,18 @@ class FluentHandler(logging.Handler):
     def emit(self, record):
         if self._queue_task is None or self._queue_task.done():
             try:
-                self._queue_task = asyncio.ensure_future(self.consume_queue(record))
+                self._queue_task = asyncio.ensure_future(
+                    self.consume_queue(record), loop=self.loop)
             except RuntimeError:
                 # no event loop running, log synchronous
                 self.sync_emit(record)
         else:
             try:
-                self._queue.put_nowait((record, int(time.time())))
+                if self._queue.qsize() >= MAX_QUEUE_SIZE:
+                    sys.stderr.write(
+                        f'Hit max log queue size({MAX_QUEUE_SIZE}), discarding message')
+                else:
+                    self._queue.put_nowait((record, int(time.time())))
             except AttributeError:
                 # just log with sync now...
                 self.sync_emit(record)
