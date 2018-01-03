@@ -113,8 +113,13 @@ class FluentHandler(logging.Handler):
         self._queue.put_nowait((initial_record, int(time.time())))
         while True:
             record, timestamp = await self._queue.get()
-            await self.async_emit(record, timestamp)
-            self._queue.task_done()
+            try:
+                await self.async_emit(record, timestamp)
+            except:
+                sys.stderr.write(
+                    f'Error processing log')
+            finally:
+                self._queue.task_done()
 
     def emit(self, record):
         if self._queue_task is None or self._queue_task.done():
