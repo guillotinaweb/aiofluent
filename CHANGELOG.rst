@@ -1,4 +1,4 @@
-1.0.7 (unreleased)
+1.0.7 (2018-01-04)
 ------------------
 
 - Handle errors processing log queue
