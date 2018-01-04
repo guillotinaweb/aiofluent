@@ -81,8 +81,6 @@ class FluentRecordFormatter(logging.Formatter, object):
                 data[str(key)] = value
 
 
-# we do *not* use maxsize setting on queue because the python implementation
-# of maxsize will block when we hit the max size--which we do not want to do
 MAX_QUEUE_SIZE = 100
 
 
