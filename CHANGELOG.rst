@@ -1,7 +1,8 @@
 1.0.7 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle errors processing log queue
+  [vangheem]
 
 
 1.0.6 (2017-11-14)
