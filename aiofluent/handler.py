@@ -83,7 +83,7 @@ class FluentRecordFormatter(logging.Formatter, object):
 
 # we do *not* use maxsize setting on queue because the python implementation
 # of maxsize will block when we hit the max size--which we do not want to do
-MAX_QUEUE_SIZE = 1000
+MAX_QUEUE_SIZE = 100
 
 
 class FluentHandler(logging.Handler):
@@ -109,7 +109,7 @@ class FluentHandler(logging.Handler):
         logging.Handler.__init__(self)
 
     async def consume_queue(self, initial_record):
-        self._queue = asyncio.Queue()
+        self._queue = asyncio.Queue(maxsize=MAX_QUEUE_SIZE)
         self._queue.put_nowait((initial_record, int(time.time())))
         while True:
             record, timestamp = await self._queue.get()
@@ -131,11 +131,11 @@ class FluentHandler(logging.Handler):
                 self.sync_emit(record)
         else:
             try:
-                if self._queue.qsize() >= MAX_QUEUE_SIZE:
-                    sys.stderr.write(
-                        f'Hit max log queue size({MAX_QUEUE_SIZE}), discarding message')
-                else:
-                    self._queue.put_nowait((record, int(time.time())))
+                self._queue.put_nowait((record, int(time.time())))
+            except asyncio.QueueFull:
+                sys.stderr.write(
+                    f'Hit max log queue size({MAX_QUEUE_SIZE}), '
+                    'discarding message')
             except AttributeError:
                 # just log with sync now...
                 self.sync_emit(record)
