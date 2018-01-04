@@ -3,6 +3,7 @@ import asyncio
 import msgpack
 import os
 import socket
+import sys
 import threading
 import time
 import traceback
@@ -141,6 +142,7 @@ class FluentSender(object):
             self.pendings += bytes_
             bytes_ = self.pendings
 
+        clean = False
         try:
             self._send_data(bytes_)
 
@@ -153,7 +155,12 @@ class FluentSender(object):
 
             # close socket
             self._close()
+            clean = True
+        except Exception:
+            sys.stderr.write('Unhandled exception sending data')
+            clean = True
 
+        if clean:
             # clear buffer if it exceeds max bufer size
             if self.pendings and (len(self.pendings) > self.bufmax):
                 self._call_buffer_overflow_handler(self.pendings)
@@ -169,6 +176,7 @@ class FluentSender(object):
             self.pendings += bytes_
             bytes_ = self.pendings
 
+        clean = False
         try:
             await self._async_send_data(bytes_)
 
@@ -181,7 +189,12 @@ class FluentSender(object):
 
             # close socket
             self._close()
+            clean = True
+        except Exception:
+            sys.stderr.write('Unhandled exception sending data')
+            clean = True
 
+        if clean:
             # clear buffer if it exceeds max bufer size
             if self.pendings and (len(self.pendings) > self.bufmax):
                 self._call_buffer_overflow_handler(self.pendings)
@@ -236,7 +249,8 @@ class FluentSender(object):
                 else:
                     sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
                     sock.settimeout(self.timeout)
-                    await loop.sock_connect(sock, ((self.host, self.port, 0, 0)))
+                    await loop.sock_connect(
+                        sock, ((self.host, self.port, 0, 0)))
             self.socket = sock
 
     def _call_buffer_overflow_handler(self, pending_events):

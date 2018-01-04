@@ -1,7 +1,8 @@
 1.0.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Always close out buffer data
+  [vangheem]
 
 
 1.0.7 (2018-01-04)
