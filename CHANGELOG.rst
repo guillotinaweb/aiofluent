@@ -1,4 +1,4 @@
-1.0.8 (unreleased)
+1.0.8 (2018-01-04)
 ------------------
 
 - Always close out buffer data
