@@ -275,5 +275,8 @@ class FluentSender(object):
 
     def _close(self):
         if self.socket:
-            self.socket.close()
+            try:
+                self.socket.close()
+            except:
+                sys.stderr.write('Could not close socket')
         self.socket = None
