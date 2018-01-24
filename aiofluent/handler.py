@@ -96,7 +96,7 @@ class FluentHandler(logging.Handler):
                  tag,
                  host='localhost',
                  port=24224,
-                 timeout=2,
+                 timeout=0.5,
                  verbose=False,
                  loop=None,
                  **kwargs):
