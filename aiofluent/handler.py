@@ -96,14 +96,16 @@ class FluentHandler(logging.Handler):
                  tag,
                  host='localhost',
                  port=24224,
-                 timeout=3.0,
+                 timeout=2,
                  verbose=False,
-                 loop=None):
+                 loop=None,
+                 **kwargs):
         self.loop = loop
         self.tag = tag
         self.sender = sender.FluentSender(tag,
                                           host=host, port=port,
-                                          timeout=timeout, verbose=verbose)
+                                          timeout=timeout, verbose=verbose,
+                                          **kwargs)
         logging.Handler.__init__(self)
 
     async def consume_queue(self, initial_record):
@@ -125,8 +127,8 @@ class FluentHandler(logging.Handler):
                 self._queue_task = asyncio.ensure_future(
                     self.consume_queue(record), loop=self.loop)
             except RuntimeError:
-                # no event loop running, log synchronous
-                self.sync_emit(record)
+                sys.stderr.write(
+                    'No event loop running to send log to fluentd')
         else:
             try:
                 self._queue.put_nowait((record, int(time.time())))
@@ -135,12 +137,7 @@ class FluentHandler(logging.Handler):
                     f'Hit max log queue size({MAX_QUEUE_SIZE}), '
                     'discarding message')
             except AttributeError:
-                # just log with sync now...
-                self.sync_emit(record)
-
-    def sync_emit(self, record):
-        data = self.format(record)
-        return self.sender.emit(None, data)
+                sys.stderr.write('Error sending async fluentd message')
 
     async def async_emit(self, record, timestamp=None):
         data = self.format(record)
@@ -149,7 +146,7 @@ class FluentHandler(logging.Handler):
     def close(self):
         self.acquire()
         try:
-            self.sender._close()
+            self.sender.close()
             logging.Handler.close(self)
             if self._queue_task is not None and not self._queue_task.done():
                 self._queue_task.cancel()
