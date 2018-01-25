@@ -124,48 +124,38 @@ class FluentSender(object):
             self._pendings += bytes_
             bytes_ = self._pendings
 
-        clean = False
         try:
-            await self._async_send_data(bytes_)
+            writer = await self.get_writer()
+            if writer is None:
+                self.clean(bytes_)
+                return False
+            writer.write(bytes_)
+            await asyncio.wait_for(writer.drain(), self._timeout)
 
-            # send finished
             self._pendings = None
-
+            self._last_error_time = 0
             return True
         except (socket.error, asyncio.TimeoutError,
                 asyncio.CancelledError, OSError, BlockingIOError) as e:
             self.last_error = e
 
-            # close socket, will be restarted again...
+            # Connection error, retry connecting
+            self.clean(bytes_)
             self.close()
-            clean = True
+            self._writer = self._reader = None
+            return False
         except Exception as ex:
             self.last_error = ex
             sys.stderr.write('Unhandled exception sending data')
-            clean = True
-
-        if clean:
-            # clear buffer if it exceeds max bufer size
-            if self._pendings and (len(self._pendings) > self._bufmax):
-                self._call_buffer_overflow_handler(self._pendings)
-                self._pendings = None
-            else:
-                self._pendings = bytes_
-
+            self.clean(bytes_)
             return False
 
-    async def _async_send_data(self, bytes_):
-        try:
-            writer = await self.get_writer()
-            writer.write(bytes_)
-            await asyncio.wait_for(writer.drain(), self._timeout)
-            self._last_error_time = 0
-        except asyncio.TimeoutError as ex:
-            self.last_error = ex
-            self._writer = self._reader = None
-        except Exception as ex:
-            self.last_error = ex
-            self._writer = self._reader = None
+    def clean(self, bytes_=b''):
+        if self._pendings and (len(self._pendings) > self._bufmax):
+            self._call_buffer_overflow_handler(self._pendings)
+            self._pendings = None
+        else:
+            self._pendings = bytes_
 
     def _call_buffer_overflow_handler(self, pending_events):
         try:
