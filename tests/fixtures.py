@@ -5,14 +5,14 @@ import pytest
 
 
 @pytest.fixture(scope="function")
-def mock_server():
-    server = mockserver.MockRecvServer('localhost')
+async def mock_server():
+    server = mockserver.MockRecvServer()
     yield server
 
 
 @pytest.fixture(scope="function")
 def test_sender(mock_server):
-    sender.setup('app', port=mock_server.port)
+    sender.setup('app', connection_factory=mock_server.factory)
     yield sender
     sender.close()
     sender._set_global_sender(None)
@@ -20,6 +20,7 @@ def test_sender(mock_server):
 
 @pytest.fixture(scope="function")
 def mock_sender(mock_server):
-    msender = sender.FluentSender(tag='test', port=mock_server.port)
+    msender = sender.FluentSender(
+        tag='test', connection_factory=mock_server.factory)
     yield msender
     msender.close()

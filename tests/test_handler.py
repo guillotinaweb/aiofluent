@@ -3,7 +3,6 @@ import asyncio
 import logging
 import pytest
 
-
 async def wait_for_queue(handler, loop):
     while handler._queue is None:
         await asyncio.sleep(0.01, loop=loop)
@@ -14,8 +13,7 @@ async def wait_for_queue(handler, loop):
 @pytest.mark.asyncio
 async def test_simple(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
-
+        'app.follow', connection_factory=mock_server.factory)
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
@@ -27,7 +25,6 @@ async def test_simple(mock_server, event_loop):
     })
     await wait_for_queue(handler, event_loop)
     handler.close()
-
     data = mock_server.get_recieved()
     assert 1 == len(data)
     assert 3 == len(data[0])
@@ -41,7 +38,7 @@ async def test_simple(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_custom_fmt(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -68,7 +65,7 @@ async def test_custom_fmt(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_json_encoded_message(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -87,7 +84,7 @@ async def test_json_encoded_message(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_unstructured_message(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -106,7 +103,7 @@ async def test_unstructured_message(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_unstructured_formatted_message(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -125,7 +122,7 @@ async def test_unstructured_formatted_message(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_non_string_simple_message(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -143,7 +140,7 @@ async def test_non_string_simple_message(mock_server, event_loop):
 @pytest.mark.asyncio
 async def test_non_string_dict_message(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
@@ -171,7 +168,7 @@ class MockQueueTask:
 @pytest.mark.asyncio
 async def test_discard_message_over_limit(mock_server, event_loop):
     handler = aiofluent.handler.FluentHandler(
-        'app.follow', port=mock_server.port, loop=event_loop)
+        'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')

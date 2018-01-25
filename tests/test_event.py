@@ -2,29 +2,32 @@
 
 from aiofluent import event, sender
 
+import pytest
 
-def test_logging(test_sender):
+
+@pytest.mark.asyncio
+async def test_logging(test_sender):
     # XXX: This tests succeeds even if the fluentd connection failed
     # send event with tag app.follow
-    event.Event('follow', {
+    await event.send_event('follow', {
         'from': 'userA',
         'to': 'userB'
     })
 
 
-def test_logging_with_timestamp(test_sender):
-    # XXX: This tests succeeds even if the fluentd connection failed
-
+@pytest.mark.asyncio
+async def test_logging_with_timestamp(test_sender):
     # send event with tag app.follow, with timestamp
-    event.Event('follow', {
+    await event.send_event('follow', {
         'from': 'userA',
         'to': 'userB'
     }, time=int(0))
 
 
-def test_no_last_error_on_successful_event(test_sender):
+@pytest.mark.asyncio
+async def test_no_last_error_on_successful_event(test_sender):
     global_sender = sender.get_global_sender()
-    event.Event('unfollow', {
+    await event.send_event('unfollow', {
         'from': 'userC',
         'to': 'userD'
     })
