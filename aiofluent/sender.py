@@ -132,11 +132,12 @@ class FluentSender(object):
             self._pendings = None
 
             return True
-        except socket.error as e:
+        except (socket.error, asyncio.TimeoutError,
+                asyncio.CancelledError, OSError, BlockingIOError) as e:
             self.last_error = e
 
-            # close socket
-            self._close()
+            # close socket, will be restarted again...
+            self.close()
             clean = True
         except Exception as ex:
             self.last_error = ex
