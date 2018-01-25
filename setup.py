@@ -13,7 +13,7 @@ desc = 'A Python logging handler for Fluentd event collector'
 
 setup(
     name='aiofluent',
-    version='1.1.0',
+    version='1.1.1.dev0',
     description=desc,
     long_description=open(README).read() + '\n\n' + open(CHANGELOG).read(),
     package_dir={'aiofluent': 'aiofluent'},
