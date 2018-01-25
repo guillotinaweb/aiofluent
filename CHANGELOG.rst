@@ -1,7 +1,8 @@
-1.0.9 (unreleased)
+1.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Move to using asyncio connection infrastructure instead of sockets
+  [vangheem]
 
 
 1.0.8 (2018-01-04)
