@@ -1,4 +1,4 @@
-1.1.0 (unreleased)
+1.1.0 (2018-01-25)
 ------------------
 
 - Move to using asyncio connection infrastructure instead of sockets
