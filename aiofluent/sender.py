@@ -70,8 +70,15 @@ class FluentSender(object):
 
         self._last_error = None
         self._last_error_time = 0
+        self._lock = None
 
         self._connection_factory = connection_factory
+
+    @property
+    def lock(self):
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
 
     async def get_writer(self):
         if self._writer is not None:
@@ -80,10 +87,11 @@ class FluentSender(object):
         if (self._last_error_time + self._retry_timeout) > time.time():
             return
 
-        result = await self._connection_factory(self)
-        if result:
-            self._reader, self._writer = result
-        return self._writer
+        async with self.lock:
+            result = await self._connection_factory(self)
+            if result:
+                self._reader, self._writer = result
+            return self._writer
 
     async def async_emit(self, label, data, timestamp=None):
         if timestamp is None:
