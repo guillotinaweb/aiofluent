@@ -1,7 +1,8 @@
 1.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- lock the whole method
+  [vangheem]
 
 
 1.1.1 (2018-02-07)

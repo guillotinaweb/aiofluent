@@ -81,13 +81,13 @@ class FluentSender(object):
         return self._lock
 
     async def get_writer(self):
-        if self._writer is not None:
-            return self._writer
-
-        if (self._last_error_time + self._retry_timeout) > time.time():
-            return
-
         async with self.lock:
+            if self._writer is not None:
+                return self._writer
+
+            if (self._last_error_time + self._retry_timeout) > time.time():
+                return
+
             result = await self._connection_factory(self)
             if result:
                 self._reader, self._writer = result
