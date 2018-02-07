@@ -1,7 +1,8 @@
 1.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Use lock on getting connection object
+  [vangheem]
 
 
 1.1.0 (2018-01-25)
