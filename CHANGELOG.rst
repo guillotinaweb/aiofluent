@@ -1,4 +1,4 @@
-1.1.3 (unreleased)
+1.1.3 (2018-02-15)
 ------------------
 
 - Lock calling the close method of sender
