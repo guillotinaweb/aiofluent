@@ -1,7 +1,11 @@
 1.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Lock calling the close method of sender
+  [vangheem]
+
+- Increase default timeout
+  [vangheem]
 
 
 1.1.2 (2018-02-07)
