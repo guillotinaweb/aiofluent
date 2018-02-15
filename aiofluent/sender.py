@@ -48,7 +48,7 @@ class FluentSender(object):
                  host='localhost',
                  port=24224,
                  bufmax=1 * 1024 * 1024,
-                 timeout=0.3,
+                 timeout=3,
                  verbose=False,
                  buffer_overflow_handler=None,
                  retry_timeout=30,
@@ -149,7 +149,8 @@ class FluentSender(object):
 
             # Connection error, retry connecting
             self.clean(bytes_)
-            self.close()
+            async with self.lock:
+                self.close()
             self._writer = self._reader = None
             return False
         except Exception as ex:
