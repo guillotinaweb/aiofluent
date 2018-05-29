@@ -1,4 +1,4 @@
-1.1.4 (unreleased)
+1.1.4 (2018-05-29)
 ------------------
 
 - Handle RuntimeError on canceling tasks/cleanup
