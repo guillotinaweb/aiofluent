@@ -1,7 +1,8 @@
 1.1.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle RuntimeError on canceling tasks/cleanup
+  [vangheem]
 
 
 1.1.3 (2018-02-15)
