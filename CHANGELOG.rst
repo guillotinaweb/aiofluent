@@ -1,4 +1,4 @@
-1.2.0 (unreleased)
+1.2.0 (2018-06-14)
 ------------------
 
 - Maintain one AsyncIO queue for all logs
