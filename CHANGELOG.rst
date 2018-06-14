@@ -1,8 +1,8 @@
-1.1.5 (unreleased)
+1.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Maintain one AsyncIO queue for all logs
+  [vangheem]
 
 1.1.4 (2018-05-29)
 ------------------

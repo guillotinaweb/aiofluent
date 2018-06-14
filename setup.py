@@ -13,7 +13,7 @@ desc = 'A Python logging handler for Fluentd event collector'
 
 setup(
     name='aiofluent',
-    version='1.1.5.dev0',
+    version='1.2.0.dev0',
     description=desc,
     long_description=open(README).read() + '\n\n' + open(CHANGELOG).read(),
     package_dir={'aiofluent': 'aiofluent'},
@@ -29,5 +29,14 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
     ],
+    extras_require={
+        'test': [
+            'pytest<=3.1.0',
+            'pytest-asyncio>=0.8.0',
+            'pytest-aiohttp',
+            'pytest-cov',
+            'coverage==4.0.3'
+        ]
+    },
     test_suite='tests'
 )

@@ -10,7 +10,7 @@ def test_no_kwargs():
     assert actual._tag == "tag"
     assert actual._host == "localhost"
     assert actual._port == 24224
-    assert actual._timeout == 0.3
+    assert actual._timeout == 3
 
     from aiofluent.sender import _set_global_sender
     _set_global_sender(None)
@@ -22,7 +22,7 @@ def test_host_and_port():
     assert actual._tag == "tag"
     assert actual._host == "myhost"
     assert actual._port == 24225
-    assert actual._timeout == 0.3
+    assert actual._timeout == 3
 
     from aiofluent.sender import _set_global_sender
     _set_global_sender(None)
