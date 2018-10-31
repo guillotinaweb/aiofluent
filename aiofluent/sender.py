@@ -5,6 +5,7 @@ import socket
 import sys
 import time
 import traceback
+import struct
 
 _global_sender = None
 
@@ -42,6 +43,17 @@ async def connection_factory(sender):
         sender.last_error = ex
 
 
+class EventTime(msgpack.ExtType):
+    def __new__(cls, timestamp):
+        seconds = int(timestamp)
+        nanoseconds = int(timestamp % 1 * 10 ** 9)
+        return super(EventTime, cls).__new__(
+            cls,
+            code=0,
+            data=struct.pack(">II", seconds, nanoseconds),
+        )
+
+
 class FluentSender(object):
     def __init__(self,
                  tag,
@@ -53,6 +65,7 @@ class FluentSender(object):
                  buffer_overflow_handler=None,
                  retry_timeout=30,
                  connection_factory=connection_factory,
+                 nanosecond_precision=False,
                  **kwargs):
 
         self._tag = tag
@@ -62,6 +75,7 @@ class FluentSender(object):
         self._timeout = timeout
         self._verbose = verbose
         self._buffer_overflow_handler = buffer_overflow_handler
+        self._nanosecond_precision = nanosecond_precision
 
         self._pendings = None
         self._reader = None
@@ -94,11 +108,17 @@ class FluentSender(object):
             return self._writer
 
     async def async_emit(self, label, data, timestamp=None):
-        if timestamp is None:
-            timestamp = int(time.time())
-        return await self.async_emit_with_time(label, timestamp, data)
+        if timestamp is not None:
+            ev_time = timestamp
+        elif self._nanosecond_precision:
+            ev_time = EventTime(time.time())
+        else:
+            ev_time = int(time.time())
+        return await self.async_emit_with_time(label, ev_time, data)
 
     async def async_emit_with_time(self, label, timestamp, data):
+        if self._nanosecond_precision and isinstance(timestamp, float):
+            timestamp = EventTime(timestamp)
         try:
             bytes_ = self._make_packet(label, timestamp, data)
         except Exception as e:
@@ -170,7 +190,7 @@ class FluentSender(object):
         try:
             if self._buffer_overflow_handler:
                 self._buffer_overflow_handler(pending_events)
-        except Exception as e:
+        except Exception:
             # User should care any exception in handler
             pass
 
