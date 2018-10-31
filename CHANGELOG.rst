@@ -1,8 +1,8 @@
 1.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add support for nanosecond precision timestamps
+  [davidonna]
 
 1.2.0 (2018-06-14)
 ------------------

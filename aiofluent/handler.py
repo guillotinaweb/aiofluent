@@ -127,12 +127,15 @@ class FluentHandler(logging.Handler):
                  timeout=3,
                  verbose=False,
                  loop=None,
+                 nanosecond_precision=False,
                  **kwargs):
         self.loop = loop
         self.tag = tag
+        self.nanosecond_precision = nanosecond_precision
         self.sender = sender.FluentSender(tag,
                                           host=host, port=port,
                                           timeout=timeout, verbose=verbose,
+                                          nanosecond_precision=self.nanosecond_precision,
                                           **kwargs)
         logging.Handler.__init__(self)
 
