@@ -1,4 +1,4 @@
-1.2.1 (unreleased)
+1.2.1 (2018-10-31)
 ------------------
 
 - Add support for nanosecond precision timestamps
