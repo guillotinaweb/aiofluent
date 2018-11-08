@@ -1,3 +1,8 @@
+1.2.2 (unreleased)
+------------------
+
+- nanosecond_precision by default
+
 1.2.1 (unreleased)
 ------------------
 
