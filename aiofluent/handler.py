@@ -91,7 +91,7 @@ class LogQueue:
 
     async def consume_queue(self, initial_record, handler):
         self._queue = asyncio.Queue(maxsize=MAX_QUEUE_SIZE)
-        self._queue.put_nowait((initial_record, handler, int(time.time())))
+        self._queue.put_nowait((initial_record, handler, time.time()))
         while True:
             record, handler, timestamp = await self._queue.get()
             try:
@@ -152,7 +152,7 @@ class FluentHandler(logging.Handler):
                     'No event loop running to send log to fluentd')
         else:
             try:
-                FluentHandler._queue.put_nowait((record, self, int(time.time())))
+                FluentHandler._queue.put_nowait((record, self, time.time()))
             except asyncio.QueueFull:
                 sys.stderr.write(
                     f'Hit max log queue size({MAX_QUEUE_SIZE}), '

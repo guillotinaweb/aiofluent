@@ -1,8 +1,8 @@
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- nanosecond_precision by default
+  [davidonna]
 
 1.2.1 (2018-10-31)
 ------------------

@@ -65,7 +65,7 @@ class FluentSender(object):
                  buffer_overflow_handler=None,
                  retry_timeout=30,
                  connection_factory=connection_factory,
-                 nanosecond_precision=False,
+                 nanosecond_precision=True,
                  **kwargs):
 
         self._tag = tag
