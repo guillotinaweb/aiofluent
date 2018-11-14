@@ -4,7 +4,7 @@ import logging
 import pytest
 
 async def wait_for_queue(handler, loop):
-    while handler._queue is None:
+    while handler._queue is None or handler._queue._queue is None:
         await asyncio.sleep(0.01, loop=loop)
     while handler._queue.qsize() > 0:
         await asyncio.sleep(0.01, loop=loop)
@@ -179,8 +179,9 @@ async def test_discard_message_over_limit(mock_server, event_loop):
             'emitted_at': '%(asctime)s',
         })
     )
-    handler._queue_task = MockQueueTask()
-    handler._queue = asyncio.Queue(maxsize=aiofluent.handler.MAX_QUEUE_SIZE)
+    aiofluent.handler.FluentHandler._queue_task = MockQueueTask()
+    aiofluent.handler.FluentHandler._queue._queue = asyncio.Queue(
+        maxsize=aiofluent.handler.MAX_QUEUE_SIZE)
     log.handlers = []
     log.addHandler(handler)
     for _ in range(aiofluent.handler.MAX_QUEUE_SIZE):

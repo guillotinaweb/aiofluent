@@ -1,8 +1,19 @@
-1.1.5 (unreleased)
+1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- nanosecond_precision by default
 
+1.2.1 (unreleased)
+------------------
+
+- Add support for nanosecond precision timestamps
+  [davidonna]
+
+1.2.0 (2018-06-14)
+------------------
+
+- Maintain one AsyncIO queue for all logs
+  [vangheem]
 
 1.1.4 (2018-05-29)
 ------------------

@@ -1,13 +1,14 @@
-sudo: false
+sudo: required
 language: python
 python:
-  - "3.5"
   - "3.6"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-    - "pip install -e ."
-    - "pip install 'coverage>=3.7,<3.8' coveralls"
+    - pip install -e .[test]
+    - pip install flake8 codecov
+    - sleep 5
 script:
-    - "PYTHONFAULTHANDLER=x timeout -sABRT 30s nosetests -vsd"
+    - flake8 aiofluent --config=setup.cfg
+    - pytest -s --cov=aiofluent -s --tb=native -v --cov-report term-missing --cov-append tests
 after_success:
-    - coveralls
+    - codecov
