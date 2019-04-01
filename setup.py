@@ -31,11 +31,10 @@ setup(
     ],
     extras_require={
         'test': [
-            'pytest<=3.1.0',
-            'pytest-asyncio>=0.8.0',
-            'pytest-aiohttp',
+            'pytest>=3.8.0',
+            'pytest-asyncio>=0.10.0',
             'pytest-cov',
-            'coverage'
+            'coverage>=4.0.3',
         ]
     },
     test_suite='tests'
