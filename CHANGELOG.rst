@@ -1,7 +1,7 @@
 1.2.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix release
 
 
 1.2.2 (2019-04-01)
