@@ -155,7 +155,7 @@ class FluentHandler(logging.Handler):
                 FluentHandler._queue.put_nowait((record, self, time.time()))
             except asyncio.QueueFull:
                 sys.stderr.write(
-                    f'Hit max log queue size({MAX_QUEUE_SIZE}), '
+                    f'Fluentd hit max log queue size({MAX_QUEUE_SIZE}), '
                     'discarding message')
             except AttributeError:
                 sys.stderr.write('Error sending async fluentd message')
