@@ -81,7 +81,7 @@ class FluentRecordFormatter(logging.Formatter, object):
                 data[str(key)] = value
 
 
-MAX_QUEUE_SIZE = 100
+MAX_QUEUE_SIZE = 500
 
 
 class LogQueue:

@@ -1,7 +1,7 @@
 1.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Increase max queue size
 
 
 1.2.3 (2019-04-01)
