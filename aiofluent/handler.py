@@ -153,6 +153,8 @@ class FluentHandler(logging.Handler):
         else:
             try:
                 FluentHandler._queue.put_nowait((record, self, time.time()))
+            except RuntimeError:
+                sys.stderr.write("RuntimeError, likely event loop closing")
             except asyncio.QueueFull:
                 sys.stderr.write(
                     f'Fluentd hit max log queue size({MAX_QUEUE_SIZE}), '

@@ -1,7 +1,8 @@
 1.2.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle event loop closed error
+  [vangheem]
 
 
 1.2.4 (2019-12-19)
