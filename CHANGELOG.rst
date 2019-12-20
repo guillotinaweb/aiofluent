@@ -1,4 +1,4 @@
-1.2.5 (unreleased)
+1.2.5 (2019-12-19)
 ------------------
 
 - Handle event loop closed error
