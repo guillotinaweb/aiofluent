@@ -1,4 +1,4 @@
-1.2.6 (unreleased)
+1.2.6 (2020-01-06)
 ------------------
 
 - Improve error logging
