@@ -1,8 +1,8 @@
 1.2.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Improve error logging
+  [vangheem]
 
 1.2.5 (2019-12-19)
 ------------------

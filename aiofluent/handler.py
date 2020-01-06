@@ -8,6 +8,7 @@ import logging
 import socket
 import sys
 import time
+import traceback
 
 
 class FluentRecordFormatter(logging.Formatter, object):
@@ -98,7 +99,9 @@ class LogQueue:
                 await handler.async_emit(record, timestamp)
             except:  # noqa
                 sys.stderr.write(
-                    f'Error processing log')
+                    'Error processing log\n{}\n'.format(
+                        traceback.format_exc()
+                    ))
             finally:
                 self._queue.task_done()
 
@@ -149,18 +152,18 @@ class FluentHandler(logging.Handler):
                     FluentHandler._queue.consume_queue(record, self), loop=self.loop)
             except RuntimeError:
                 sys.stderr.write(
-                    'No event loop running to send log to fluentd')
+                    'No event loop running to send log to fluentd\n')
         else:
             try:
                 FluentHandler._queue.put_nowait((record, self, time.time()))
             except RuntimeError:
-                sys.stderr.write("RuntimeError, likely event loop closing")
+                sys.stderr.write("RuntimeError, likely event loop closing\n")
             except asyncio.QueueFull:
                 sys.stderr.write(
                     f'Fluentd hit max log queue size({MAX_QUEUE_SIZE}), '
-                    'discarding message')
+                    'discarding message\n')
             except AttributeError:
-                sys.stderr.write('Error sending async fluentd message')
+                sys.stderr.write('Error sending async fluentd message\n')
 
     async def async_emit(self, record, timestamp=None):
         data = self.format(record)
