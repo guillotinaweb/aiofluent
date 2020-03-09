@@ -1,4 +1,4 @@
-1.2.7 (unreleased)
+1.2.7 (2020-03-09)
 ------------------
 
 - Fix repo location
