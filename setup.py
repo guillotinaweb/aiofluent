@@ -21,7 +21,7 @@ setup(
     install_requires=['msgpack-python'],
     author='Nathan Van Gheem',
     author_email='vangheem@gmail.com',
-    url='https://github.com/onna/aiofluent',
+    url='https://github.com/guillotinaweb/aiofluent',
     download_url='http://pypi.python.org/pypi/aiofluent/',
     license='Apache License, Version 2.0',
     classifiers=[
