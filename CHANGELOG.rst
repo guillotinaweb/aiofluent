@@ -1,7 +1,7 @@
 1.2.7 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix repo location
 
 
 1.2.6 (2020-01-06)
