@@ -1,7 +1,7 @@
 1.2.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle TypeError formatting log data
 
 
 1.2.7 (2020-03-09)

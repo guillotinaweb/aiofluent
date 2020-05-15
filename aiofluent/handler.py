@@ -42,7 +42,7 @@ class FluentRecordFormatter(logging.Formatter, object):
         for key, value in self._fmt_dict.items():
             try:
                 data[key] = value % record.__dict__
-            except KeyError:
+            except (KeyError, TypeError):
                 # we are okay with missing values here...
                 pass
 
