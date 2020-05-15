@@ -1,4 +1,4 @@
-1.2.8 (unreleased)
+1.2.8 (2020-05-15)
 ------------------
 
 - Handle TypeError formatting log data
