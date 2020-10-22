@@ -1,4 +1,4 @@
-1.2.9 (unreleased)
+1.2.9 (2020-10-22)
 ------------------
 
 - Only log errors every 30 seconds
