@@ -1,21 +1,23 @@
 import aiofluent.handler
+from unittest.mock import patch
 import asyncio
 import logging
 import pytest
 
-async def wait_for_queue(handler, loop):
+async def wait_for_queue(handler):
     while handler._queue is None or handler._queue._queue is None:
-        await asyncio.sleep(0.01, loop=loop)
+        await asyncio.sleep(0.01)
     while handler._queue.qsize() > 0:
-        await asyncio.sleep(0.01, loop=loop)
+        await asyncio.sleep(0.01)
 
 
 @pytest.mark.asyncio
-async def test_simple(mock_server, event_loop):
+async def test_simple(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
@@ -23,7 +25,7 @@ async def test_simple(mock_server, event_loop):
         'from': 'userA',
         'to': 'userB'
     })
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
     data = mock_server.get_recieved()
     assert 1 == len(data)
@@ -32,16 +34,17 @@ async def test_simple(mock_server, event_loop):
     assert 'userA' == data[0][2]['from']
     assert 'userB' == data[0][2]['to']
     assert data[0][1]
-    assert isinstance(data[0][1], int)
+    assert isinstance(data[0][1], float)
 
 
 @pytest.mark.asyncio
-async def test_custom_fmt(mock_server, event_loop):
+async def test_custom_fmt(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(
         aiofluent.handler.FluentRecordFormatter(fmt={
             'name': '%(name)s',
@@ -52,7 +55,7 @@ async def test_custom_fmt(mock_server, event_loop):
     log.handlers = []
     log.addHandler(handler)
     log.info({'sample': 'value'})
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -63,17 +66,18 @@ async def test_custom_fmt(mock_server, event_loop):
 
 
 @pytest.mark.asyncio
-async def test_json_encoded_message(mock_server, event_loop):
+async def test_json_encoded_message(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
     log.info('{"key": "hello world!", "param": "value"}')
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -82,17 +86,18 @@ async def test_json_encoded_message(mock_server, event_loop):
 
 
 @pytest.mark.asyncio
-async def test_unstructured_message(mock_server, event_loop):
+async def test_unstructured_message(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
     log.info('hello %s', 'world')
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -101,17 +106,18 @@ async def test_unstructured_message(mock_server, event_loop):
 
 
 @pytest.mark.asyncio
-async def test_unstructured_formatted_message(mock_server, event_loop):
+async def test_unstructured_formatted_message(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
     log.info('hello world, %s', 'you!')
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -120,17 +126,18 @@ async def test_unstructured_formatted_message(mock_server, event_loop):
 
 
 @pytest.mark.asyncio
-async def test_non_string_simple_message(mock_server, event_loop):
+async def test_non_string_simple_message(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
     log.info(42)
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -138,17 +145,18 @@ async def test_non_string_simple_message(mock_server, event_loop):
 
 
 @pytest.mark.asyncio
-async def test_non_string_dict_message(mock_server, event_loop):
+async def test_non_string_dict_message(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(aiofluent.handler.FluentRecordFormatter())
     log.handlers = []
     log.addHandler(handler)
     log.info({42: 'root'})
-    await wait_for_queue(handler, event_loop)
+    await wait_for_queue(handler)
     handler.close()
 
     data = mock_server.get_recieved()
@@ -166,12 +174,13 @@ class MockQueueTask:
 
 
 @pytest.mark.asyncio
-async def test_discard_message_over_limit(mock_server, event_loop):
+async def test_discard_message_over_limit(mock_server):
     handler = aiofluent.handler.FluentHandler(
         'app.follow', connection_factory=mock_server.factory)
 
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
     handler.setFormatter(
         aiofluent.handler.FluentRecordFormatter(fmt={
             'name': '%(name)s',
@@ -180,8 +189,8 @@ async def test_discard_message_over_limit(mock_server, event_loop):
         })
     )
     aiofluent.handler.FluentHandler._queue_task = MockQueueTask()
-    aiofluent.handler.FluentHandler._queue._queue = asyncio.Queue(
-        maxsize=aiofluent.handler.MAX_QUEUE_SIZE)
+    aiofluent.handler.FluentHandler._queue = aiofluent.handler.LogQueue(
+        asyncio.Queue(maxsize=aiofluent.handler.MAX_QUEUE_SIZE))
     log.handlers = []
     log.addHandler(handler)
     for _ in range(aiofluent.handler.MAX_QUEUE_SIZE):
@@ -192,4 +201,38 @@ async def test_discard_message_over_limit(mock_server, event_loop):
     log.info({'sample': 'value'})
     # does not add, same queue size...
     assert handler._queue.qsize() == qsize
+    handler.close()
+
+
+@pytest.mark.asyncio
+async def test_discard_message_over_limit_does_not_space_stderr(mock_server):
+    handler = aiofluent.handler.FluentHandler(
+        'app.follow', connection_factory=mock_server.factory)
+
+    logging.basicConfig(level=logging.INFO)
+    log = logging.getLogger('fluent.test')
+    log.setLevel(logging.INFO)
+    handler.setFormatter(
+        aiofluent.handler.FluentRecordFormatter(fmt={
+            'name': '%(name)s',
+            'lineno': '%(lineno)d',
+            'emitted_at': '%(asctime)s',
+        })
+    )
+    aiofluent.handler.FluentHandler._queue_task = MockQueueTask()
+    aiofluent.handler.FluentHandler._queue = aiofluent.handler.LogQueue(
+        asyncio.Queue(maxsize=1))
+    log.handlers = []
+    log.addHandler(handler)
+    log.info({'sample': 'value'})
+
+    with patch('aiofluent.handler.sys.stderr.write') as stderr:
+        log.info({'sample': 'value'})
+        stderr.assert_called()
+
+    with patch('aiofluent.handler.sys.stderr.write') as stderr:
+        # should not log this time
+        log.info({'sample': 'value'})
+        stderr.assert_not_called()
+
     handler.close()

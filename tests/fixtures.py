@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.fixture(scope="function")
-async def mock_server(loop):
+async def mock_server():
     server = mockserver.MockRecvServer()
     yield server
 

@@ -36,10 +36,10 @@ async def connection_factory(sender):
             asyncio.open_connection(sender._host, sender._port),
             sender._timeout)
     except (asyncio.TimeoutError, asyncio.CancelledError) as ex:
-        sys.stderr.write(f'Timeout connecting to fluentd')
+        sys.stderr.write('Timeout connecting to fluentd')
         sender.last_error = ex
     except Exception as ex:
-        sys.stderr.write(f'Unknown error connecting to fluentd')
+        sys.stderr.write('Unknown error connecting to fluentd')
         sender.last_error = ex
 
 

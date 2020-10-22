@@ -1,7 +1,7 @@
 1.2.9 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Only log errors every 30 seconds
 
 
 1.2.8 (2020-05-15)

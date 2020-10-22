@@ -49,7 +49,6 @@ async def test_simple(mock_sender, mock_server):
     assert 'test.foo' == data[0][0]
     assert {'bar': 'baz'} == data[0][2]
     assert data[0][1]
-    assert isinstance(data[0][1], int)
 
 
 @pytest.mark.asyncio
