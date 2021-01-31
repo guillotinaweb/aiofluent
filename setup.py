@@ -35,6 +35,9 @@ setup(
             'pytest-asyncio>=0.10.0',
             'pytest-cov',
             'coverage>=4.0.3',
+            'isort',
+            'black',
+            'flake8'
         ]
     },
     test_suite='tests'

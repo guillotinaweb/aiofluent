@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import msgpack
 import socket
+import struct
 import sys
 import time
 import traceback
-import struct
+
+import msgpack
 
 _global_sender = None
 
 
 def _set_global_sender(sender):
-    """ [For testing] Function to set global sender directly
-    """
+    """[For testing] Function to set global sender directly"""
     global _global_sender
     _global_sender = sender
 
@@ -33,13 +33,13 @@ def close():
 async def connection_factory(sender):
     try:
         return await asyncio.wait_for(
-            asyncio.open_connection(sender._host, sender._port),
-            sender._timeout)
+            asyncio.open_connection(sender._host, sender._port), sender._timeout
+        )
     except (asyncio.TimeoutError, asyncio.CancelledError) as ex:
-        sys.stderr.write('Timeout connecting to fluentd')
+        sys.stderr.write("Timeout connecting to fluentd")
         sender.last_error = ex
     except Exception as ex:
-        sys.stderr.write('Unknown error connecting to fluentd')
+        sys.stderr.write("Unknown error connecting to fluentd")
         sender.last_error = ex
 
 
@@ -55,18 +55,20 @@ class EventTime(msgpack.ExtType):
 
 
 class FluentSender(object):
-    def __init__(self,
-                 tag,
-                 host='localhost',
-                 port=24224,
-                 bufmax=1 * 1024 * 1024,
-                 timeout=3,
-                 verbose=False,
-                 buffer_overflow_handler=None,
-                 retry_timeout=30,
-                 connection_factory=connection_factory,
-                 nanosecond_precision=True,
-                 **kwargs):
+    def __init__(
+        self,
+        tag,
+        host="localhost",
+        port=24224,
+        bufmax=1 * 1024 * 1024,
+        timeout=3,
+        verbose=False,
+        buffer_overflow_handler=None,
+        retry_timeout=30,
+        connection_factory=connection_factory,
+        nanosecond_precision=True,
+        **kwargs
+    ):
 
         self._tag = tag
         self._host = host
@@ -123,15 +125,20 @@ class FluentSender(object):
             bytes_ = self._make_packet(label, timestamp, data)
         except Exception as e:
             self.last_error = e
-            bytes_ = self._make_packet(label, timestamp,
-                                       {"level": "CRITICAL",
-                                        "message": "Can't output to log",
-                                        "traceback": traceback.format_exc()})
+            bytes_ = self._make_packet(
+                label,
+                timestamp,
+                {
+                    "level": "CRITICAL",
+                    "message": "Can't output to log",
+                    "traceback": traceback.format_exc(),
+                },
+            )
         return await self._async_send(bytes_)
 
     def _make_packet(self, label, timestamp, data):
         if label:
-            tag = '.'.join((self._tag, label))
+            tag = ".".join((self._tag, label))
         else:
             tag = self._tag
         packet = (tag, timestamp, data)
@@ -163,8 +170,13 @@ class FluentSender(object):
             self._pendings = None
             self._last_error_time = 0
             return True
-        except (socket.error, asyncio.TimeoutError,
-                asyncio.CancelledError, OSError, BlockingIOError) as e:
+        except (
+            socket.error,
+            asyncio.TimeoutError,
+            asyncio.CancelledError,
+            OSError,
+            BlockingIOError,
+        ) as e:
             self.last_error = e
 
             # Connection error, retry connecting
@@ -175,11 +187,11 @@ class FluentSender(object):
             return False
         except Exception as ex:
             self.last_error = ex
-            sys.stderr.write('Unhandled exception sending data')
+            sys.stderr.write("Unhandled exception sending data")
             self.clean(bytes_)
             return False
 
-    def clean(self, bytes_=b''):
+    def clean(self, bytes_=b""):
         if self._pendings and (len(self._pendings) > self._bufmax):
             self._call_buffer_overflow_handler(self._pendings)
             self._pendings = None

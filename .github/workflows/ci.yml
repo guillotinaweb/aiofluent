@@ -1,0 +1,40 @@
+name: guillotina_amqp
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository first
+      - uses: actions/checkout@v2
+
+      # Setup the python version
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      # Linters and typing
+      - name: Install
+        run: |
+          pip install -e .[test]
+
+      # Linters and typing
+      - name: Pre-checks
+        run: |
+          # Run commands
+          flake8 aiofluent --config=setup.cfg
+          isort -c aiofluent
+          black --check --verbose aiofluent
+
+      # Run tests
+      - name: Run tests
+        run: |
+          # Run tests
+          pytest --capture=no --tb=native -v tests --cov=aiofluent --cov-report xml
+
+          # install codecov library
+          pip install codecov
+
+          codecov --url="https://open-coverage.org/api" --token=14396163 --slug=guillotinaweb/aiofluent
